@@ -1,0 +1,93 @@
+gcc -Wall -Wextra -g -pthread -o test_linked_list test_linked_list.c linked_list.c -pthread
+./test_linked_list
+=== Thread-Safe Linked List – Automated Tests ===
+
+[1] UNIT TESTS
+
+--- test_push_single ---
+  [PASS] push single: size == 1
+  [PASS] push single: get(0) returns correct pointer
+
+--- test_push_multiple_order ---
+  [PASS] push multiple: size == 3
+  [PASS] push multiple: get(0) == a
+  [PASS] push multiple: get(1) == b
+  [PASS] push multiple: get(2) == c
+
+--- test_pop_removes_last ---
+  [PASS] pop: returns last element
+  [PASS] pop: size decremented
+  [PASS] pop: new tail is b
+
+--- test_pop_empty ---
+  [PASS] pop empty: returns NULL
+  [PASS] pop empty: size remains 0
+
+--- test_pop_single_element ---
+  [PASS] pop single: returns element
+  [PASS] pop single: list now empty
+  [PASS] pop single: get returns NULL
+
+--- test_insert_after_middle ---
+  [PASS] insertAfter middle: returns 0
+  [PASS] insertAfter middle: size == 4
+  [PASS] insertAfter middle: x at index 2
+  [PASS] insertAfter middle: c pushed to 3
+
+--- test_insert_after_tail ---
+  [PASS] insertAfter tail: size == 3
+  [PASS] insertAfter tail: x is new tail
+
+--- test_insert_after_not_found ---
+  [PASS] insertAfter not found: returns -2
+  [PASS] insertAfter not found: size unchanged
+
+--- test_delete_existing ---
+  [PASS] delete existing: returns 0
+  [PASS] delete existing: size == 2
+  [PASS] delete existing: c shifted to index 1
+
+--- test_delete_head ---
+  [PASS] delete head: size == 1
+  [PASS] delete head: b is new head
+
+--- test_delete_not_found ---
+  [PASS] delete not found: returns -1
+  [PASS] delete not found: size unchanged
+
+--- test_get_out_of_range ---
+  [PASS] get out-of-range: returns NULL
+
+--- test_clear ---
+  [PASS] clear: size == 0
+  [PASS] clear: get returns NULL
+
+[2] CONCURRENCY TESTS
+
+--- test_concurrent_pushes_correct_size ---
+  [PASS] concurrent push: final size == THREAD_COUNT * OPS_PER_THREAD
+
+--- test_concurrent_push_pop_no_crash ---
+  [PASS] concurrent push/pop: no errors under contention
+  [PASS] concurrent push/pop: size within sane bounds
+
+[3] DEADLOCK-FREEDOM TESTS  (timeout = 5s each)
+
+--- test_deadlock_push_completes ---
+  [PASS] deadlock push: 5000 pushes complete within 5s
+  [PASS] deadlock push: size == 5000
+
+--- test_deadlock_pop_completes ---
+  [PASS] deadlock pop: 1000 pops complete within 5s
+  [PASS] deadlock pop: list is empty after pops
+
+--- test_deadlock_insert_after_completes ---
+  [PASS] deadlock insertAfter: 500 insert+delete cycles within 5s
+
+--- test_deadlock_two_threads ---
+  [PASS] deadlock two threads: push thread completes in time
+  [PASS] deadlock two threads: pop  thread completes in time
+
+=== Results: 42 passed, 0 failed ===
+gcc -Wall -Wextra -g -pthread -o rest_api rest_api.c linked_list.c \
+	-lmicrohttpd -lcjson -pthread
